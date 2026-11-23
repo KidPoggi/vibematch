@@ -73,9 +73,13 @@ def rank_profiles(style, profiles):
 
 with st.sidebar:
     st.header("Configuration")
+    try:
+        saved_api_key = st.secrets.get("OPENAI_API_KEY", os.getenv("OPENAI_API_KEY", ""))
+    except Exception:
+        saved_api_key = os.getenv("OPENAI_API_KEY", "")
     api_key = st.text_input(
         "Clé API OpenAI", type="password",
-        value=os.getenv("OPENAI_API_KEY", "")
+        value=saved_api_key
     )
     st.caption("La clé est saisie dans cette session et n'est pas enregistrée dans le dépôt.")
     profiles = load_profiles()
