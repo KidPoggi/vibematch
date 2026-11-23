@@ -307,7 +307,7 @@ if step == "home":
     with b:
         st.markdown('<div class="card"><div class="kicker">02 · Le portrait-robot</div><h3>Tu gardes le dernier mot</h3><p>On propose des caractéristiques visibles. Tu confirmes, corriges ou supprimes ce qui ne te ressemble pas.</p></div>', unsafe_allow_html=True)
     with c:
-        st.markdown('<div class="card"><div class="kicker">03 · La galerie</div><h3>Les troublantes coïncidences</h3><p>Des célébrités, puis quelques sosies venus d'un autre univers : fiction, animation ou peinture.</p></div>', unsafe_allow_html=True)
+        st.markdown("""<div class="card"><div class="kicker">03 · La galerie</div><h3>Les troublantes coïncidences</h3><p>Des célébrités, puis quelques sosies venus d'un autre univers : fiction, animation ou peinture.</p></div>""", unsafe_allow_html=True)
 
 elif step == "shooting":
     render_progress(step)
