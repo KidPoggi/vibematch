@@ -1,4 +1,4 @@
-# VibeMatch
+# Trouve ton sosie
 
 Prototype Streamlit de recherche de proximités d'esthétique.
 
