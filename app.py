@@ -395,15 +395,22 @@ elif step == "confirm":
                     for candidate in matches.get("celebrities", [])[:6]:
                         name = str(candidate.get("name", "")).strip()
                         if name:
-                            enriched.append({**candidate, "wikipedia": wikipedia_page(name),
-                                             "commons": commons_photo(name), "google_images": google_images_url(name)})
+                            wiki = wikipedia_page(name)
+                            commons = commons_photo(name)
+                            # Keep only candidates with a public reference we could verify.
+                            if wiki or commons:
+                                enriched.append({**candidate, "wikipedia": wiki,
+                                                 "commons": commons, "google_images": google_images_url(name)})
                     enriched_other = []
                     if include_other:
                         for candidate in matches.get("other_universe", [])[:3]:
                             name = str(candidate.get("name", "")).strip()
                             if name:
-                                enriched_other.append({**candidate, "commons": commons_photo(name),
-                                                       "google_images": google_images_url(name)})
+                                wiki = wikipedia_page(name)
+                                commons = commons_photo(name)
+                                if wiki or commons:
+                                    enriched_other.append({**candidate, "wikipedia": wiki, "commons": commons,
+                                                           "google_images": google_images_url(name)})
                     st.session_state.matches = enriched
                     st.session_state.other_matches = enriched_other
                 st.session_state.step = "results"
