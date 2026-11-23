@@ -130,17 +130,16 @@ def analyze_photos(api_key, photos):
         "type": "input_text",
         "text": (
             "Tu es l'assistant d'un studio photo ludique. Examine les photos fournies ensemble "
-            "et décris seulement les caractéristiques physiques visibles et non sensibles utiles "
-            "à un portrait-robot de sosie : forme générale du visage, forme des yeux, couleur des "
-            "yeux si lisible, sourcils, nez, bouche, mâchoire, couleur/texture/longueur des cheveux, "
-            "détails visibles distinctifs (taches de rousseur, fossettes, lunettes, barbe). Décris "
-            "aussi l'allure générale. N'identifie personne, ne compare pas à une célébrité à cette "
-            "étape, et ne déduis jamais l'origine, l'ethnicité, la race, la religion, la santé ou "
-            "d'autres données sensibles. N'invente pas les détails masqués : écris 'à confirmer' "
-            "si tu hésites. Réponds uniquement en JSON valide, en français, avec ces clés chaîne : "
-            "face_shape, eye_shape, eye_color, eyebrows, nose, mouth, jawline, hair_color, "
-            "hair_texture, hair_length, distinctive_features, vibe, summary."
-        )
+            "et décris uniquement les éléments de style non biométriques : coiffure (couleur, "
+            "texture, longueur, coupe), barbe ou style de grooming visible, lunettes, accessoires, "
+            "vêtements, palette de couleurs, maquillage et allure générale. N'analyse pas la "
+            "géométrie du visage, les yeux, le nez, la bouche, la mâchoire, les proportions faciales "
+            "ou les empreintes du visage. Ne compare pas les visages à ceux de célébrités. Ne déduis "
+            "jamais l'origine, l'ethnicité, la race, la religion, la santé ou d'autres données "
+            "sensibles. N'invente pas les détails masqués : écris 'à confirmer' si tu hésites. "
+            "Réponds uniquement en JSON valide, en français, avec ces clés chaîne : hair_color, "
+            "hair_texture, hair_length, haircut, grooming, eyewear, clothing, palette, makeup, "
+            "accessories, overall_style, summary."        )
     }]
     for photo in photos:
         encoded = base64.b64encode(photo["data"]).decode("ascii")
@@ -156,14 +155,13 @@ def analyze_photos(api_key, photos):
 def search_lookalikes(api_key, traits, preference, age_range, category):
     client = get_client(api_key)
     prompt = f"""
-Tu es le directeur de casting d'un jeu de sosies, drôle mais respectueux.
-À partir des caractéristiques VISIBLES confirmées par la personne, propose des rapprochements
-avec des célébrités publiques du monde entier. Il s'agit d'un jeu de ressemblance, jamais d'une
-identification ni d'une affirmation que les personnes sont la même personne.
-Ne te limite pas à la couleur des cheveux : tiens compte de la forme du visage, du regard,
-des sourcils, du nez, de la bouche, de la mâchoire et de l'expression quand ces informations
-sont présentes. Ne déduis pas l'origine ou l'ethnicité de la personne photographiée.
-N'invente pas de personnes et ne propose que des personnalités publiques réelles, adultes.
+Tu es le directeur de casting d'un jeu de sosies de style, drôle mais respectueux.
+À partir des éléments de style NON BIOMÉTRIQUES confirmés par la personne, propose des
+célébrités publiques du monde entier qui partagent une esthétique, une coiffure, un grooming,
+des accessoires ou une allure générale comparables. N'analyse pas et ne compare pas les visages :
+pas de géométrie faciale, de traits du visage, d'empreintes ou de scores biométriques.
+Il s'agit de suggestions de style ludiques, pas de sosies faciaux ni d'identification.
+Ne déduis pas l'origine ou l'ethnicité de la personne photographiée.
 Préférence de recherche : {preference}
 Tranche d'âge de célébrités souhaitée : {age_range}
 Univers professionnel souhaité : {category}
@@ -305,7 +303,7 @@ if step == "home":
     with a:
         st.markdown('<div class="card"><div class="kicker">01 · Le shooting</div><h3>Quelques clichés</h3><p>Trois photos maximum, idéalement avec une bonne lumière. Pas besoin de faire la couverture de Vogue.</p></div>', unsafe_allow_html=True)
     with b:
-        st.markdown('<div class="card"><div class="kicker">02 · Le portrait-robot</div><h3>Tu gardes le dernier mot</h3><p>On propose des caractéristiques visibles. Tu confirmes, corriges ou supprimes ce qui ne te ressemble pas.</p></div>', unsafe_allow_html=True)
+        st.markdown('<div class="card"><div class="kicker">02 · Le portrait-robot</div><h3>Tu gardes le dernier mot</h3><p>On décrit ton style, ta coiffure et ton allure. Tu confirmes, corriges ou supprimes ce qui ne te ressemble pas.</p></div>', unsafe_allow_html=True)
     with c:
         st.markdown("""<div class="card"><div class="kicker">03 · La galerie</div><h3>Les troublantes coïncidences</h3><p>Des célébrités, puis quelques sosies venus d'un autre univers : fiction, animation ou peinture.</p></div>""", unsafe_allow_html=True)
 
@@ -330,7 +328,7 @@ elif step == "shooting":
         consent = st.checkbox(
             "J'accepte que mes photos soient envoyées à l'API OpenAI pour analyser les caractéristiques visibles. Elles ne sont pas enregistrées dans le dépôt GitHub.",
             value=False)
-        st.caption("Les photos sont conservées en mémoire de session par l'application. Leur traitement par l'API est soumis aux conditions et paramètres de données OpenAI.")
+        st.caption("Les photos sont conservées en mémoire de session par l'application. Elles servent à décrire les éléments de style visibles, pas à créer une empreinte faciale. Leur traitement par l'API est soumis aux conditions et paramètres de données OpenAI.")
         ready = bool(uploaded) and len(uploaded) <= 3 and consent and bool(api_key)
         if not api_key:
             st.warning("Il faut une clé API OpenAI dans les réglages à gauche pour analyser les photos.")
@@ -358,19 +356,18 @@ elif step == "confirm":
         with st.form("confirm_traits"):
             col1, col2 = st.columns(2)
             with col1:
-                face_shape = st.text_input("Forme générale du visage", value=analysis.get("face_shape", "à confirmer"))
-                eye_shape = st.text_input("Forme des yeux / regard", value=analysis.get("eye_shape", "à confirmer"))
-                eye_color = st.text_input("Couleur des yeux", value=analysis.get("eye_color", "à confirmer"))
-                eyebrows = st.text_input("Sourcils", value=analysis.get("eyebrows", "à confirmer"))
-                nose = st.text_input("Nez", value=analysis.get("nose", "à confirmer"))
-            with col2:
-                mouth = st.text_input("Bouche / sourire", value=analysis.get("mouth", "à confirmer"))
-                jawline = st.text_input("Mâchoire / menton", value=analysis.get("jawline", "à confirmer"))
                 hair_color = st.text_input("Couleur des cheveux", value=analysis.get("hair_color", "à confirmer"))
                 hair_texture = st.text_input("Texture des cheveux", value=analysis.get("hair_texture", "à confirmer"))
                 hair_length = st.text_input("Longueur des cheveux", value=analysis.get("hair_length", "à confirmer"))
-            distinctive = st.text_input("Détails distinctifs (taches de rousseur, fossettes, lunettes…)", value=analysis.get("distinctive_features", ""))
-            vibe = st.text_input("Allure générale (facultatif)", value=analysis.get("vibe", ""))
+                haircut = st.text_input("Coupe / coiffure", value=analysis.get("haircut", "à confirmer"))
+                grooming = st.text_input("Barbe / style de grooming (si visible)", value=analysis.get("grooming", "à confirmer"))
+            with col2:
+                eyewear = st.text_input("Lunettes / accessoires portés", value=analysis.get("eyewear", "à confirmer"))
+                clothing = st.text_input("Style vestimentaire", value=analysis.get("clothing", "à confirmer"))
+                palette = st.text_input("Palette de couleurs", value=analysis.get("palette", "à confirmer"))
+                makeup = st.text_input("Maquillage (si visible)", value=analysis.get("makeup", "à confirmer"))
+                accessories = st.text_input("Autres accessoires", value=analysis.get("accessories", ""))
+            overall_style = st.text_input("Allure générale / univers esthétique (facultatif)", value=analysis.get("overall_style", ""))
             st.markdown("**Affinons la recherche**")
             pref1, pref2 = st.columns(2)
             with pref1:
@@ -382,10 +379,10 @@ elif step == "confirm":
             submitted = st.form_submit_button("Je valide mon portrait-robot — trouve mes sosies !", type="primary", use_container_width=True)
         if submitted:
             traits = {
-                "face_shape": face_shape, "eye_shape": eye_shape, "eye_color": eye_color,
-                "eyebrows": eyebrows, "nose": nose, "mouth": mouth, "jawline": jawline,
                 "hair_color": hair_color, "hair_texture": hair_texture, "hair_length": hair_length,
-                "distinctive_features": distinctive, "vibe": vibe,
+                "haircut": haircut, "grooming": grooming, "eyewear": eyewear,
+                "clothing": clothing, "palette": palette, "makeup": makeup,
+                "accessories": accessories, "overall_style": overall_style,
             }
             st.session_state.confirmed_traits = traits
             try:
@@ -429,10 +426,10 @@ elif step == "results":
         flash_says("Et voilà le tirage ! J'ai fait le tour du monde, vidé trois annuaires et pris un café. Voici les ressemblances à examiner.")
     with right:
         st.markdown('<div class="kicker">Étape 3 · Le grand révélateur</div><h2>Les sosies sont dans la boîte !</h2>', unsafe_allow_html=True)
-        st.write("Des rapprochements ludiques à partir de ton portrait-robot confirmé, pas des identifications ni des mesures scientifiques.")
+        st.write("Des rapprochements d'esthétique fondés sur les éléments de style que tu as confirmés. Ce ne sont pas des comparaisons biométriques ni des sosies faciaux.")
     celebrities = st.session_state.get("matches", [])
     if celebrities:
-        st.markdown("### Tes pistes côté célébrités")
+        st.markdown("### Tes sosies de style côté célébrités")
         grid = st.columns(3)
         for index, person in enumerate(celebrities):
             with grid[index % 3]:
