@@ -12,7 +12,7 @@ import streamlit as st
 from PIL import Image
 from openai import OpenAI
 
-st.set_page_config(page_title="Trouve ton sosie", page_icon="📸", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Trouve ton sosie", page_icon="📸", layout="wide", initial_sidebar_state="expanded")
 
 MASCOT = """
 <svg viewBox="0 0 280 320" role="img" aria-label="Monsieur Flash, photographe du studio">
