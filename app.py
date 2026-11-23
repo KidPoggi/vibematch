@@ -6,11 +6,11 @@ from pathlib import Path
 import streamlit as st
 from openai import OpenAI
 
-st.set_page_config(page_title="VibeMatch", page_icon="✨", layout="wide")
+st.set_page_config(page_title="Trouve ton sosie", page_icon="✨", layout="wide")
 DATA_PATH = Path(__file__).parent / "celebrities.json"
 
-st.title("✨ VibeMatch")
-st.caption("Recherche de proximités d’esthétique — prototype expérimental")
+st.title("✨ Trouve ton sosie")
+st.caption("Découvre les célébrités qui partagent ton style")
 st.info(
     "Cette version analyse les éléments de style visibles (coiffure, vêtements, "
     "palette, maquillage et accessoires). Elle ne réalise pas d’identification "
